@@ -35,7 +35,7 @@ jobs:
           docker build -t python-webapp-cicd .
       
       - name: Armazenar artefato como release do GitHub
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: python-webapp-cicd
           path: github.com/dasilvaguilherme/python-webapp-cicd/artifact
