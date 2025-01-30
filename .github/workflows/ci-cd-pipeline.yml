@@ -26,9 +26,12 @@ jobs:
         run: |
           pytest
       
-      - name: Construir a aplicação Docker
+      - name: Construir e publicar a aplicação Docker com versionamento
         run: |
           docker build -t python-webapp-cicd .
+          docker tag python-webapp-cicd ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:$GITHUB_SHA
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:$GITHUB_SHA
       
       - name: Armazenar artefato como release do GitHub
         uses: actions/upload-artifact@v4.6.0
@@ -47,15 +50,49 @@ jobs:
       - name: Deploy para ambiente de teste
         run: |
           echo "Deploying application..."
+          
+  notify_success:
+    runs-on: ubuntu-latest
+    if: success()
+    needs:
+      - build
+      - deploy
+    steps:
+      - name: Notificar desenvolvedor sobre sucesso via e-mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: 'Sucesso no Pipeline CI/CD'
+          body: |
+            O pipeline CI/CD foi concluído com sucesso.
+            
+            Detalhes do build:
+            - Workflow: ${{ github.workflow }}
+            - Repositório: ${{ github.repository }}
+            - Branch: ${{ github.ref }}
+            - Commit: ${{ github.sha }}
+            - Autor do commit: ${{ github.actor }}
+            
+            Artefatos gerados:
+            - Nome do artefato: python-webapp-cicd
+            - Caminho do artefato: github.com/dasilvaguilherme/python-webapp-cicd/artifact
+            
+            Link para o workflow:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: dasilva.guilherme.582@gmail.com
+          from: ${{ secrets.SMTP_USERNAME }}
 
-  notify:
+  notify_failure:
     runs-on: ubuntu-latest
     if: failure()
     needs:
       - build
       - deploy
     steps:
-      - name: Notificar desenvolvedor via e-mail
+      - name: Notificar desenvolvedor sobre falha via e-mail
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -64,7 +101,6 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: 'Falha no Pipeline CI/CD'
           body: |
-            body: |
             O pipeline CI/CD falhou em uma das etapas.
             
             A falha ocorreu na etapa: ${{ job.status == 'failure' && github.job || 'desconhecida' }}.
