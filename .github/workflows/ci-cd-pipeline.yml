@@ -26,6 +26,10 @@ jobs:
         run: |
           pytest
       
+      - name: Executar Linter
+        run: |
+          flake8 .
+      
       - name: Construir a aplicação Docker
         run: |
           docker build -t python-webapp-cicd .
@@ -34,19 +38,43 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: python-webapp-cicd
-          path: ./path/to/artifact
+          path: github.com/dasilvaguilherme/python-webapp-cicd/artifact
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     if: success()
+    environment:
+      name: testing
+    
     steps:
       - name: Aprovação do deploy
         uses: hmarr/approve-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          approvers: 'user-or-group-name'
+          approvers: 'dasilvaguilherme'
       
       - name: Deploy para ambiente de teste
         run: |
-          # Comando para realizar o deploy da aplicação no ambiente de teste.
+          echo "Deploying application..."
+
+  notify:
+    runs-on: ubuntu-latest
+    if: failure()
+    needs:
+      - build
+      - deploy
+    steps:
+      - name: Notificar desenvolvedor via e-mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: 'Falha no Pipeline CI/CD'
+          body: |
+            O pipeline CI/CD falhou em uma das etapas.
+            Verifique os logs no GitHub Actions para mais detalhes.
+          to: dasilva.guilherme.582@gmail.com
+          from: ${{ secrets.SMTP_USERNAME }}
