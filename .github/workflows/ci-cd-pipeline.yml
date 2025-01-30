@@ -47,7 +47,7 @@ jobs:
           draft: false
           prerelease: false
           commitish: '${{ github.sha }}'
-          repo: 'https://git:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git'
+          repo: '${{ github.repository }}'
           user: '${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
