@@ -44,16 +44,6 @@ jobs:
       name: testing
     
     steps:
-      - name: Aguardar aprovação manual
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: dasilvaguilherme
-          minimum-approvals: 1
-          issue-title: "Aprovar deploy para ambiente de teste"
-          issue-body: "Por favor, aprove o deploy para o ambiente de teste."
-          exclude-workflow-initiator-as-approver: false
-      
       - name: Deploy para ambiente de teste
         run: |
           echo "Deploying application..."
