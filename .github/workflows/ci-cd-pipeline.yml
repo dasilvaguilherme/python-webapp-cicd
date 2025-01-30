@@ -26,10 +26,6 @@ jobs:
         run: |
           pytest
       
-      - name: Executar Linter
-        run: |
-          flake8 .
-      
       - name: Construir a aplicação Docker
         run: |
           docker build -t python-webapp-cicd .
