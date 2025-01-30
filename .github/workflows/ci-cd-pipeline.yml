@@ -44,11 +44,15 @@ jobs:
       name: testing
     
     steps:
-      - name: Aprovação do deploy
-        uses: hmarr/approve-action@v1
+      - name: Aguardar aprovação manual
+        uses: trstringer/manual-approval@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          approvers: 'dasilvaguilherme'
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: dasilvaguilherme
+          minimum-approvals: 1
+          issue-title: "Aprovar deploy para ambiente de teste"
+          issue-body: "Por favor, aprove o deploy para o ambiente de teste."
+          exclude-workflow-initiator-as-approver: false
       
       - name: Deploy para ambiente de teste
         run: |
@@ -70,7 +74,18 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: 'Falha no Pipeline CI/CD'
           body: |
+            body: |
             O pipeline CI/CD falhou em uma das etapas.
-            Verifique os logs no GitHub Actions para mais detalhes.
+            
+            A falha ocorreu na etapa: ${{ job.status == 'failure' && github.job || 'desconhecida' }}.
+            
+            Detalhes da falha:
+            - Job que falhou: ${{ github.job }}
+            - Workflow: ${{ github.workflow }}
+            - Repositório: ${{ github.repository }}
+            - Branch: ${{ github.ref }}
+            
+            Verifique os logs no GitHub Actions para mais detalhes:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           to: dasilva.guilherme.582@gmail.com
           from: ${{ secrets.SMTP_USERNAME }}
