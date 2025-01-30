@@ -99,12 +99,23 @@ Se preferir, você pode executar a aplicação utilizando Docker:
 
 1. **Construa a imagem Docker**:
    ```bash
-   docker build -t my-fastapi-app .
+   docker build -t python-webapp-cicd .
    ```
 
 2. **Execute o contêiner**:
    ```bash
-   docker run -p 80:80 my-fastapi-app
+   docker run -p 80:80 python-webapp-cicd
    ```
 
 A aplicação estará disponível em `http://localhost`.
+
+Acessar a documentação da API:
+Abra `http://localhost/docs` em seu navegador para ver a documentação interativa da API.
+
+## Testar o endpoint de geração:
+
+   ```bash
+    curl -X POST http://localhost/generate \
+     -H "Content-Type: application/json" \
+     -d '{"input": {}}'
+   ```
