@@ -35,10 +35,13 @@ jobs:
           docker tag python-webapp-cicd ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:latest
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:latest
+
+
       - name: Build zip file
         run: |
-          zip -r python-webapp-cicd.zip ./path-to-your-app
-      
+          mkdir -p artefact
+          zip -r artefact/python-webapp-cicd.zip ./artefact
+
       - name: Github Actions Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -54,9 +57,10 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./python-webapp-cicd.zip
+          asset_path: ./artefact/python-webapp-cicd.zip
           asset_name: python-webapp-cicd.zip
           asset_content_type: application/zip
+
 
   deploy-to-staging:
     runs-on: ubuntu-latest
