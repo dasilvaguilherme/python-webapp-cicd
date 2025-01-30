@@ -38,17 +38,14 @@ jobs:
       
       - name: Github Actions Create Release
         id: create_release
-        uses: idev-coder/github-actions-release@v1.0.0
+        uses: actions/create-release@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: '${{ github.ref_name }}-${{ github.sha }}'
-          name: 'Release ${{ github.ref_name }}-${{ github.sha }}'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: '${{ github.ref_name }}-${{ github.sha }}'
+          release_name: 'Release ${{ github.ref_name }}-${{ github.sha }}'
           body: 'Release for ${{ github.ref_name }}'
           draft: false
           prerelease: false
-          commitish: '${{ github.sha }}'
-          repo: '${{ github.repository }}'
-          user: '${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
