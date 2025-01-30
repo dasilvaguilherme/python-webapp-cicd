@@ -29,34 +29,62 @@ jobs:
       - name: Construir e publicar a aplicação Docker com versionamento
         run: |
           docker build -t python-webapp-cicd .
-          docker tag python-webapp-cicd ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:$GITHUB_SHA
+          docker tag python-webapp-cicd ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:latest
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:$GITHUB_SHA
+          docker push ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:latest
       
-      - name: Armazenar artefato como release do GitHub
-        uses: actions/upload-artifact@v4.6.0
+      - name: Criar Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: python-webapp-cicd
-          path: github.com/dasilvaguilherme/python-webapp-cicd/artifact
+          tag_name: ${{ github.ref }}-${{ github.sha }}
+          release_name: Release ${{ github.ref }}-${{ github.sha }}
+          draft: false
+          prerelease: false
 
-  deploy:
+      - name: Armazenar artefato como release do GitHub
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./python-webapp-cicd.tar.gz
+          asset_name: python-webapp-cicd-${{ github.sha }}.tar.gz
+          asset_content_type: application/gzip
+
+  deploy-to-staging:
     runs-on: ubuntu-latest
     needs: build
     if: success()
     environment:
-      name: testing
+      name: staging
     
     steps:
-      - name: Deploy para ambiente de teste
+      - name: Checkout código
+        uses: actions/checkout@v2
+
+      - name: Deploy para ambiente de staging
         run: |
-          echo "Deploying application..."
-          
+          echo "Simulando deploy para o ambiente de staging..."
+          # Cenario em que o ambiente staging existe
+          # docker pull ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:staging
+          # docker stop python-webapp-cicd || true
+          # docker rm python-webapp-cicd || true
+          # docker run -d --name python-webapp-cicd -p 8080:80 ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:staging
+
+      - name: Verificar deploy
+        run: |
+          echo "Simulando verificação do deploy no ambiente de staging..."
+          # curl http://localhost:8080/health || exit 1
+
   notify_success:
     runs-on: ubuntu-latest
     if: success()
     needs:
       - build
-      - deploy
+      - deploy-to-staging
     steps:
       - name: Notificar desenvolvedor sobre sucesso via e-mail
         uses: dawidd6/action-send-mail@v3
@@ -90,7 +118,6 @@ jobs:
     if: failure()
     needs:
       - build
-      - deploy
     steps:
       - name: Notificar desenvolvedor sobre falha via e-mail
         uses: dawidd6/action-send-mail@v3
