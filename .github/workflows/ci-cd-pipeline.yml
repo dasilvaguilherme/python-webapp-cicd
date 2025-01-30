@@ -48,13 +48,16 @@ jobs:
 
   make-artifact:
     runs-on: ubuntu-latest
+    needs: 
+    - build-python
+    - build-docker      
     steps:
       - name: Checar o código
         uses: actions/checkout@v2
       - name: Build zip file
         run: |
           mkdir -p artifact
-          cp -r ./requirements.txt Dockerfile app.py ./tests/*./artefact
+          cp -r ./requirements.txt Dockerfile app.py ./tests/* ./artefact
           zip -r artefact/python-webapp-cicd.zip ./artefact
 
       - name: Github Actions Create Release
@@ -84,8 +87,6 @@ jobs:
   deploy-to-staging:
     runs-on: ubuntu-latest
     needs: 
-    - build-python
-    - build-docker
     - make-artifact
     if: success()
     environment:
@@ -113,9 +114,6 @@ jobs:
     runs-on: ubuntu-latest
     if: success()
     needs: 
-      - build-python
-      - build-docker
-      - make-artifact
       - deploy-to-staging
     steps:
       - name: Notificar desenvolvedor sobre sucesso via e-mail
