@@ -46,12 +46,13 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: '${{ github.ref_name }}-${{ github.sha }}'
           release_name: 'Release ${{ github.ref_name }}-${{ github.sha }}'
           body: 'Release for ${{ github.ref_name }}'
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release Asset
         id: upload-release-asset 
