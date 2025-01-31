@@ -96,7 +96,7 @@ jobs:
       - name: Build zip file
         run: |
           mkdir -p artifact
-          cp -r ./requirements.txt Dockerfile app.py ./tests/* ./artifact
+          cp -r ./requirements.txt Dockerfile app.py test_main.py ./artifact
           zip -r artifact/python-webapp-cicd.zip ./artifact
 
       - name: Github Actions Create Release
