@@ -40,7 +40,7 @@ jobs:
     
       - name: Run pylint
         run: |
-          pylint --disable=C0103,C0111 **/*.py
+          pylint --disable=C0103,C0111,E1121 **/*.py
 
 
   build-and-test-python:

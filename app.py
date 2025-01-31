@@ -4,6 +4,7 @@ Módulo principal para a API de geração de imagens.
 Este módulo utiliza FastAPI para expor endpoints REST para geração e
 retorno de imagens baseadas nos parâmetros fornecidos pelo usuário.
 """
+
 import json
 import asyncio
 import base64
@@ -97,8 +98,9 @@ logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
 if __name__ == "__main__":
     uvicorn.run(
-        app,
+        "app:app",
         host=config['server']['host'],
         port=config['server']['port'],
         log_level=config['logging']['level'].lower()
     )
+    
