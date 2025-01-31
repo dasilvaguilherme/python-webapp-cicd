@@ -9,7 +9,7 @@ from pydantic import BaseModel
 with open('config.json', 'r', encoding='utf-8') as config_file:
     config = json.load(config_file)
 
-class EndpointFilter(logging.Filter):
+class EndpointFilter(logging.Filter):  # pylint: disable=too-few-public-methods
     def filter(self, record: logging.LogRecord) -> bool:
         return record.args and len(record.args) >= 3 and record.args[2] != "/health"
 
