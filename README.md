@@ -103,7 +103,7 @@ A aplicação estará disponível em `http://localhost:8080`.
 
 ## Exemplo de uso pelo navegador
 
-![Exemplo de uso pelo navegador](https://github.com/dasilvaguilherme/python-webapp-cicd/assets/output.png)
+![Exemplo de uso pelo navegador](https://github.com/dasilvaguilherme/python-webapp-cicd/blob/main/assets/output.png)
 
 ## Executando com Docker
 
