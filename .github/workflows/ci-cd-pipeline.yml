@@ -176,6 +176,7 @@ jobs:
       - build-docker
       - make-artifact
       - deploy-to-staging
+      - deploy-to-production
     steps:
       - name: Notificar desenvolvedor sobre falha via e-mail
         uses: dawidd6/action-send-mail@v3
