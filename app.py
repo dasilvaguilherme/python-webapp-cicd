@@ -1,9 +1,13 @@
+import json
 import logging
 import uvicorn
 from fastapi import FastAPI, status
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
+# Load configuration
+with open('config.json', 'r') as config_file:
+    config = json.load(config_file)
 
 class EndpointFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
@@ -17,7 +21,7 @@ class HealthResponse(BaseModel):
 class GenerateRequest(BaseModel):
     input: dict  
 
-app = FastAPI(title="Simple Web Application")
+app = FastAPI(title=config['app']['name'], version=config['app']['version'])
 
 @app.get("/")
 def index():
@@ -40,10 +44,13 @@ def get_health():
     status_code=status.HTTP_200_OK,
     response_model=dict)
 def generate_response(request: GenerateRequest):
-
     input_data = request.input  
-
     return {"message": "Generation request received.", "input": input_data}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    uvicorn.run(
+        app, 
+        host=config['server']['host'], 
+        port=config['server']['port'],
+        log_level=config['logging']['level'].lower()
+    )
