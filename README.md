@@ -1,12 +1,15 @@
 # Simple Web Application
 
-Este é um projeto de uma aplicação web simples construída com FastAPI. A aplicação possui endpoints para verificar a saúde e gerar respostas baseadas em requisições JSON.
+Este é um projeto de uma aplicação web simples construída com FastAPI para gerar imagem de diferentes tamanhos apenas para testar o pipeline de CI/CD.
 
 ## Estrutura do Projeto
 
 ```
 my-fastapi-app/
 ├── app.py             # Código principal da aplicação FastAPI
+├── generator.py       # Módulo para geração de imagens
+├── test_main.py       # Módulo para testes unitários
+├── index.html         # Arquivo HTML para a interface do usuário
 ├── requirements.txt   # Dependências do projeto
 └── Dockerfile         # Arquivo para construir a imagem Docker
 ```
@@ -49,17 +52,22 @@ Para iniciar a aplicação, execute o seguinte comando:
 python app.py
 ```
 
-A aplicação estará disponível em `http://localhost:80`.
+A aplicação estará disponível em `http://localhost:8080`.
 
 ## Endpoints
+### 1. `/ui`
 
-### 1. `/`
+- **Método**: GET
+- **Descrição**: Redireciona para a interface do usuário.
+- **Resposta**: Redireciona para `/index.html`.
+
+### 2. `/`
 
 - **Método**: GET
 - **Descrição**: Redireciona para a documentação da API.
 - **Resposta**: Redireciona para `/docs`.
 
-### 2. `/health`
+### 3. `/health`
 
 - **Método**: GET
 - **Descrição**: Realiza uma verificação de saúde da aplicação.
@@ -72,7 +80,7 @@ A aplicação estará disponível em `http://localhost:80`.
     }
     ```
 
-### 3. `/generate`
+### 4. `/generate`
 
 - **Método**: POST
 - **Descrição**: Recebe um JSON com a estrutura `{ "input": {} }` e retorna uma confirmação.
@@ -93,6 +101,10 @@ A aplicação estará disponível em `http://localhost:80`.
     }
     ```
 
+## Exemplo de uso pelo navegador
+
+![Exemplo de uso pelo navegador](https://github.com/dasilvaguilherme/python-webapp-cicd/assets/output.png)
+
 ## Executando com Docker
 
 Se preferir, você pode executar a aplicação utilizando Docker:
@@ -104,18 +116,18 @@ Se preferir, você pode executar a aplicação utilizando Docker:
 
 2. **Execute o contêiner**:
    ```bash
-   docker run -p 80:80 python-webapp-cicd
+   docker run -p 8080:8080 python-webapp-cicd
    ```
 
-A aplicação estará disponível em `http://localhost`.
+A aplicação estará disponível em `http://localhost:8080`.
 
 Acessar a documentação da API:
-Abra `http://localhost/docs` em seu navegador para ver a documentação interativa da API.
+Abra `http://localhost:8080/docs` em seu navegador para ver a documentação interativa da API.
 
 ## Testar o endpoint de geração:
 
    ```bash
-    curl -X POST http://localhost/generate \
+    curl -X POST http://localhost:8080/generate \
      -H "Content-Type: application/json" \
      -d '{"input": {}}'
    ```

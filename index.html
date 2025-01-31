@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Imagens</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input, button { margin: 5px; padding: 10px; }
+        img { margin-top: 20px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Gerador de Imagens</h1>
+    <label>Largura: <input type="number" id="width" value="640"></label>
+    <label>Altura: <input type="number" id="height" value="480"></label>
+    <label>Iterações: <input type="number" id="iterations" value="100"></label>
+    <button onclick="generateImage()">Gerar Imagem</button>
+    <br>
+    <img id="output" style="display:none;">
+    <script>
+        async function generateImage() {
+            let width = document.getElementById("width").value;
+            let height = document.getElementById("height").value;
+            let iterations = document.getElementById("iterations").value;
+
+            let response = await fetch("/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ width, height, iterations })
+            });
+
+            let data = await response.json();
+            let img = document.getElementById("output");
+            img.src = "data:image/png;base64," + data.image;
+            img.style.display = "block";
+        }
+    </script>
+</body>
+</html>

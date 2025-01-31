@@ -9,24 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  sonarqube:
-    name: SonarQube
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.python.version=3.10
-
   lint-and-quality-check:
     runs-on: ubuntu-latest
-    needs: sonarqube
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -95,7 +79,6 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push ${{ secrets.DOCKER_USERNAME }}/python-webapp-cicd:latest
 
-
   make-artifact:
     runs-on: ubuntu-latest
     needs: 
@@ -159,39 +142,6 @@ jobs:
         run: |
           echo "Simulando verificação do deploy no ambiente de staging..."
           # curl http://localhost:8080/health || exit 1
-
-  notify_success:
-    runs-on: ubuntu-latest
-    if: success()
-    needs: 
-      - deploy-to-staging
-    steps:
-      - name: Notificar desenvolvedor sobre sucesso via e-mail
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: 'Sucesso no Pipeline CI/CD'
-          body: |
-            O pipeline CI/CD foi concluído com sucesso.
-            
-            Detalhes do build:
-            - Workflow: ${{ github.workflow }}
-            - Repositório: ${{ github.repository }}
-            - Branch: ${{ github.ref }}
-            - Commit: ${{ github.sha }}
-            - Autor do commit: ${{ github.actor }}
-            
-            Artefatos gerados:
-            - Nome do artefato: python-webapp-cicd
-            - Caminho do artefato: github.com/dasilvaguilherme/python-webapp-cicd/artifact
-            
-            Link para o workflow:
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: dasilva.guilherme.582@gmail.com
-          from: ${{ secrets.SMTP_USERNAME }}
 
   notify_failure:
     runs-on: ubuntu-latest
