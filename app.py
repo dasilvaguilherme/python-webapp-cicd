@@ -60,14 +60,10 @@ async def generate_image(req: GenerateImageRequest):
         await asyncio.sleep(req.delay)
 
     img = generator.generate(
-        req.width,
-        req.height,
-        req.iterations,
-        req.re_min,
-        req.re_max,
-        req.im_min,
-        req.im_max,
-    )
+    req.width,
+    req.height,
+    req.iterations,
+    (req.re_min, req.re_max, req.im_min, req.im_max))
 
     buffered = BytesIO()
     img.save(buffered, format="png")
