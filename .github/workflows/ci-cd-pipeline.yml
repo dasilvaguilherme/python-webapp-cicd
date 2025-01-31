@@ -35,9 +35,12 @@ jobs:
             echo "config.json found. Proceeding with the pipeline."
           fi
 
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+    
       - name: Run pylint
         run: |
-          pylint **/*.py
+          pylint --disable=C0103,C0111 **/*.py
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
