@@ -1,12 +1,9 @@
-FROM python:3.9-slim
+FROM python:3.13.0-slim-bookworm
+
+EXPOSE 8080/tcp
 
 WORKDIR /app
+COPY ./requirements.txt *.py  index.html ./
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app.py .
-
-EXPOSE 80
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+CMD ["fastapi", "run", "/app/main.py", "--host", "0.0.0.0", "--port", "8080"]
